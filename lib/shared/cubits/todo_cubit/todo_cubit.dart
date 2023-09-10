@@ -13,8 +13,12 @@ class TodoCubit extends Cubit<TodoStates> {
 
   static TodoCubit get(context) => BlocProvider.of(context);
   // changing page ****************************************************
-  int page = 0;
+  /*
+    when changing the page the range of the list changing
+    range is specified by start and end which we get from getStart() and getEnd() functions
+  */
 
+  int page = 0;
   void changePage(int newPage) {
     page = newPage;
     getStart();
@@ -27,6 +31,11 @@ class TodoCubit extends Cubit<TodoStates> {
     else return ((page + 1) * 40) ;
   }
   // filter ************************************************************
+  /*
+    selectedId variable refers to the user id we want to display his todos list
+    if the todos list is not completely fetched getTodos() is called
+    when filtering is performed pagination bar is hidden and all the users todos is shown in one single list
+  */
   bool isFiltered = false ;
   int? selectedId;
   List<TodoModel> filteredList = [];
@@ -49,8 +58,11 @@ class TodoCubit extends Cubit<TodoStates> {
   }
 
   // get users **********************************************************
+  /*
+    get the users data and save it to use in todos item cuz todos come with only the user id
+    date come as a list of users so i add them directly to users list
+  */
   List<UserModel> users = [];
-
   void getUsers() async {
     DioService.getData(
       url: EndPoints.getUsers,
@@ -59,17 +71,23 @@ class TodoCubit extends Cubit<TodoStates> {
       for (int i = 0; i < value.data.length; i++) {
         users.add(UserModel.fromJson(value.data[i]));
       }
-      print('********************************************************');
-      print(value.data);
-      print('********************************************************');
       emit(GetUsersSuccessState());
     }).catchError((e) {
-      print('$e **************************************');
       emit(GetUsersErrorState());
     });
   }
 
   // get todos ***********************************************************
+  /*
+    get todos data and store it in the todos list
+    data come in two in steps each step we get 100 items
+    data divided in two pages each page has 100 items
+    apiPage variable refers to the data page
+    when cubit being created the getTodos() function being called , apiPage = 1
+    and after fetching the first 100 items the page increment by 1
+    when the UI needs to display the rest items the getTodos() function is recalled
+    when the user moves to any page more than 3 or when he perform filter by user
+  */
   List<TodoModel> todos = [];
   int apiPage = 1;
   void getTodos() async {
@@ -84,16 +102,9 @@ class TodoCubit extends Cubit<TodoStates> {
       for (int i = 0; i < value.data.length; i++) {
         todos.add(TodoModel.fromJson(value.data[i]));
       }
-      print('********************************************************');
-      print(value.data);
-      print('********************************************************');
       emit(GetTodosSuccessState());
       apiPage++;
-      print('************************************************');
-      print(apiPage);
-      print('************************************************');
     }).catchError((e) {
-      print('$e **************************************');
       emit(GetTodosErrprState());
     });
   }

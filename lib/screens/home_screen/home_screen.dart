@@ -23,69 +23,74 @@ class Home extends StatelessWidget {
         var cubit = TodoCubit.get(context);
         return Scaffold(
           body: SafeArea(
-              child: SingleChildScrollView(
-            child: Column(
-              children: [
-                if (cubit.page == 0)
-                  Padding(
-                    padding: EdgeInsetsDirectional.only(
-                      top: 10.h,
-                    ),
-                    child: Text(
-                      'Filter by user',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
-                if (cubit.page == 0)
-                  Animate(
-                    effects: [
-                      FadeEffect(
-                        duration: Duration(milliseconds: 300),
-                        delay: Duration(milliseconds: 200),
-                      )
-                    ],
-                    child: Container(
-                      height: 130.h,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  if (cubit.page == 0)
+                    Padding(
                       padding: EdgeInsetsDirectional.only(
-                        start: 10.w,
-                        end: 10.w,
                         top: 10.h,
-                        bottom: 5.h,
                       ),
-                      child: UsersItemsList(users: cubit.users),
+                      child: Text(
+                        'Filter by user',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                  if (cubit.page == 0)
+                    Animate(
+                      effects: [
+                        FadeEffect(
+                          duration: Duration(milliseconds: 300),
+                          delay: Duration(milliseconds: 200),
+                        ),
+                      ],
+                      child: Container(
+                        height: 130.h,
+                        padding: EdgeInsetsDirectional.only(
+                          start: 10.w,
+                          end: 10.w,
+                          top: 10.h,
+                          bottom: 5.h,
+                        ),
+                        child: UsersItemsList(users: cubit.users),
+                      ),
+                    ),
+                  if (cubit.page == 0)
+                    Padding(
+                      padding: EdgeInsetsDirectional.only(
+                        top: 0.h,
+                        bottom: 10.h,
+                      ),
+                      child: Text(
+                        cubit.selectedId == null
+                            ? 'All Todos'
+                            : 'All Todos for ${cubit.users[cubit.selectedId! - 1].name}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                  ConditionalBuilder(
+                    condition:
+                        cubit.todos.isNotEmpty || state is GetTodosLoadingState,
+                    builder: (context) {
+                      return !cubit.isFiltered
+                          ? Listo(
+                              list: cubit.todos
+                                  .getRange(cubit.getStart(), cubit.getEnd())
+                                  .toList())
+                          : Listo(
+                              list: cubit.filteredList,
+                            );
+                    },
+                    fallback: (context) => Center(
+                      child: CupertinoActivityIndicator(
+                        radius: 15.w,
+                      ),
                     ),
                   ),
-                if (cubit.page == 0)
-                Padding(
-                  padding: EdgeInsetsDirectional.only(
-                    top: 0.h,
-                    bottom: 10.h,
-                  ),
-                  child: Text(
-                    cubit.selectedId == null ? 'All Todos' : 'All Todos for ${cubit.users[cubit.selectedId!-1].name}',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ),
-                ConditionalBuilder(
-                  condition:
-                      cubit.todos.isNotEmpty || state is GetTodosLoadingState,
-                  builder: (context) {
-                    return !cubit.isFiltered
-                        ? Listo(
-                            list: cubit.todos
-                                .getRange(cubit.getStart(), cubit.getEnd())
-                                .toList())
-                        : Listo(list: cubit.filteredList);
-                  },
-                  fallback: (context) => Center(
-                    child: CupertinoActivityIndicator(
-                      radius: 15.w,
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          )),
+          ),
           bottomSheet: !cubit.isFiltered
               ? Animate(
                   effects: [
